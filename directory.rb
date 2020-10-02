@@ -26,9 +26,16 @@ end
 
 def print_students(students)
   # print each student name
+  max_name_length = 0
   students.each do |student|
     if student[:status] == "active"
-      puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]} cohort)"
+      max_name_length = [student[:name].length,  max_name_length].max
+    end
+  end
+
+  students.each do |student|
+    if student[:status] == "active"
+      puts "#{student[:id]} - " + student[:name].center(max_name_length) + " (#{student[:cohort]} cohort)"
     end
   end
 end
