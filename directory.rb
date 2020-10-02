@@ -17,6 +17,7 @@ def input_students
   # return the array of students or empty
   students
 end
+
 def print_header
   # print the header for the list of students
   puts "\nThe students of Villains Academy"
@@ -34,10 +35,11 @@ end
 
 def print_footer(names)
   # print the footer for the list of students
-  puts "\nOverall, we have #{names.select { |student| student[:status] == "active" }.count} great students\n\n"
+  puts "\nOverall, we have #{names.select { |student| student[:status] == "active" }.count} great students\n"
 end
 
 def report_first_letter(students, report_key)
+  puts "\n"
   students.each do |student|
     if student[:status] == "active" && student[:name][0,1].downcase == report_key
       puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]})"
@@ -63,10 +65,12 @@ def kernel
   user_input = ""
 
   while user_input != "exit" do
-    puts "What would you like to do? '?' for help"
+    puts "\nWhat would you like to do? '?' for help"
     user_input = gets.chomp.downcase
 
     case user_input
+    when "?"
+      puts "'create' 'print' 'report' 'exit'"
     when "create"
       student_input = input_students
       if !student_input.empty?
@@ -80,12 +84,14 @@ def kernel
 
     when "report"
       while user_input !="quit"
-        puts "Which report? '?' for help"
+        puts "\nWhich report? '?' for help"
         user_input = gets.chomp.downcase
 
         case user_input
+        when "?"
+          puts "'first letter', 'quit'"
         when "first letter"
-          puts "Letter to report by:"
+          puts "\nLetter to report by:"
           report_key = gets.chomp.downcase
 
           report_first_letter(students,report_key)
