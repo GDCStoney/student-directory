@@ -38,8 +38,10 @@ def print_footer(names)
 end
 
 def report_first_letter(students, report_key)
-  students.each_with_index do |student, index|
-    puts "#{('000' + (index + 1).to_s).split('').last(3).join}"
+  students.each do |student|
+    if student[:status] == "active" && student[:name][0,1].downcase == report_key
+      puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]})"
+    end
   end
 end
 
@@ -83,12 +85,10 @@ def kernel
 
         case user_input
         when "first letter"
-#          puts "Letter to report by:"
-#          report_key = gets.chomp.downcase
-#
-#
-#        print_header
-#        report
+          puts "Letter to report by:"
+          report_key = gets.chomp.downcase
+
+          report_first_letter(students,report_key)
         end
       end
     end
