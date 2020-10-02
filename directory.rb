@@ -26,7 +26,7 @@ end
 
 def print_students(students)
   # print each student name
-  students.each_with_index do |student, index|
+  students.each do |student|
     if student[:status] == "active"
       puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]} cohort)"
     end
@@ -42,6 +42,15 @@ def report_first_letter(students, report_key)
   puts "\n"
   students.each do |student|
     if student[:status] == "active" && student[:name][0,1].downcase == report_key
+      puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]})"
+    end
+  end
+end
+
+def report_short_names(students, report_length)
+  puts "\n"
+  students.each do |student|
+    if student[:name].length <= report_length
       puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]})"
     end
   end
@@ -89,12 +98,17 @@ def kernel
 
         case user_input
         when "?"
-          puts "'first letter', 'quit'"
+          puts "'first letter', 'short name', 'quit'"
         when "first letter"
           puts "\nLetter to report by:"
           report_key = gets.chomp.downcase
 
           report_first_letter(students,report_key)
+        when "short names"
+          puts "\nMax length of name:"
+          report_length = gets.chomp.to_i
+
+          report_short_names(students, report_length)
         end
       end
     end
