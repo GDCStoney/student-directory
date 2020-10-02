@@ -13,6 +13,23 @@ students = [
   {name: "Norman Bates", cohort: :november}
 ]
 
+def input_students
+  puts "Please enter the names of the students"
+  puts "to finish, just hit return twice"
+  # create an empty array unless first entry is ""
+  students =[]
+  name = gets.chomp
+  # while name is not empty, get details
+  while !name.empty? do
+    # create student hash in students array
+    students << {name: name, cohort: :november}
+    puts "Now we have #{students.count} students"
+    name =gets.chomp
+  end
+  # return the array of students or empty
+  students
+end
+
 def print_header
   # print the header for the list of students
   puts "\nThe students of Ciallains Academy"
@@ -32,6 +49,12 @@ def print_footer(names)
 end
 
 # run methods
+# fill student list
+student_input = input_students
+if !student_input.empty?
+  students = student_input
+end
+# print the student list
 print_header
 print_students(students)
 print_footer(students)
