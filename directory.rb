@@ -1,18 +1,3 @@
-# Setup variables
-students = [
-  {name: 'Dr. Hannibal Lecter', cohort: :november},
-  {name: "Darth Vader", cohort: :november},
-  {name: "Nurse Ratched", cohort: :november},
-  {name: "Michael Corleone", cohort: :november},
-  {name: "Alex DeLarge", cohort: :november},
-  {name: "The Wicked Witch of the West", cohort: :november},
-  {name: "Terminator", cohort: :november},
-  {name: "Freddy Krueger", cohort: :november},
-  {name: "The Joker", cohort: :november},
-  {name: "Joffrey Baratheon", cohort: :november},
-  {name: "Norman Bates", cohort: :november}
-]
-
 def input_students
   puts "Please enter the names of the students"
   puts "to finish, just hit return twice"
@@ -22,39 +7,92 @@ def input_students
   # while name is not empty, get details
   while !name.empty? do
     # create student hash in students array
-    students << {name: name, cohort: :november}
+    # id is created with the intent that deletion doesn't delete a record
+    id_string = ("000" + students.count.to_s).split('').last(3).join
+    students << {name: name, id: id_string, cohort: :november, status: "active"}
+
     puts "Now we have #{students.count} students"
     name =gets.chomp
   end
   # return the array of students or empty
   students
 end
-
 def print_header
   # print the header for the list of students
-  puts "\nThe students of Ciallains Academy"
+  puts "\nThe students of Villains Academy"
   puts "--------------"
 end
 
 def print_students(students)
   # print each student name
-  students.each do |student|
-    puts "#{student[:name]} (#{student[:cohort]} cohort)"
+  students.each_with_index do |student, index|
+    if student[:status] == "active"
+      puts "#{student[:id]} - #{student[:name]} (#{student[:cohort]} cohort)"
+    end
   end
 end
 
 def print_footer(names)
   # print the footer for the list of students
-  puts "\nOverall, we have #{names.count} great students\n\n"
+  puts "\nOverall, we have #{names.select { |student| student[:status] == "active" }.count} great students\n\n"
 end
 
-# run methods
-# fill student list
-student_input = input_students
-if !student_input.empty?
-  students = student_input
+def report_first_letter(students, report_key)
+  students.each_with_index do |student, index|
+    puts "#{('000' + (index + 1).to_s).split('').last(3).join}"
+  end
 end
-# print the student list
-print_header
-print_students(students)
-print_footer(students)
+
+def kernel
+  # Setup variables
+  students = [
+    {name: 'Dr. Hannibal Lecter', id: "001", cohort: :november, status: "active"},
+    {name: "Darth Vader", id: "002", cohort: :november, status: "active"},
+    {name: "Nurse Ratched", id: "003", cohort: :november, status: "active"},
+    {name: "Michael Corleone", id: "004", cohort: :november, status: "active"},
+    {name: "Alex DeLarge", id: "005", cohort: :november, status: "active"},
+    {name: "The Wicked Witch of the West", id: "006", cohort: :november, status: "active"},
+    {name: "Terminator", id: "007", cohort: :november, status: "active"},
+    {name: "Freddy Krueger", id: "008", cohort: :november, status: "active"},
+    {name: "The Joker", id: "009", cohort: :november, status: "active"},
+    {name: "Joffrey Baratheon", id: "010", cohort: :november, status: "active"},
+    {name: "Norman Bates", id: "011", cohort: :november, status: "active"}
+  ]
+  user_input = ""
+
+  while user_input != "exit" do
+    puts "What would you like to do? '?' for help"
+    user_input = gets.chomp.downcase
+
+    case user_input
+    when "create"
+      student_input = input_students
+      if !student_input.empty?
+        students = student_input
+      end
+
+    when "print"
+      print_header
+      print_students(students)
+      print_footer(students)
+
+    when "report"
+      while user_input !="quit"
+        puts "Which report? '?' for help"
+        user_input = gets.chomp.downcase
+
+        case user_input
+        when "first letter"
+#          puts "Letter to report by:"
+#          report_key = gets.chomp.downcase
+#
+#
+#        print_header
+#        report
+        end
+      end
+    end
+  end
+end
+
+kernel
