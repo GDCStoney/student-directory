@@ -88,15 +88,25 @@ def get_user_input (location)
     input_char = ''
   else
     while input_char != "\r"
-      input_full += input_char
-      print input_char
-
-      choices[location.to_sym].each  do |choice|
-        if input_full == choice[0..input_full.length-1]
-          print choice[input_full.length..choice.length]
-          input_full = choice
+      if input_char == "\u007F"
+        if input_full.length == 1
+          input_full = ""
+        else
+          input_full = input_full[0..input_full.length-2]
         end
-      end
+        input_char=''
+        print "\033[1D\033[K"
+      else
+        input_full += input_char
+        print input_char
+
+        choices[location.to_sym].each  do |choice|
+          if input_full == choice[0..input_full.length-1]
+            print choice[input_full.length..choice.length]
+            input_full = choice
+          end
+        end
+    end
 
       input_char = STDIN.getch
     end
