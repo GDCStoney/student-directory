@@ -10,7 +10,7 @@ def input_students
   while !name.empty? do
     # create student hash in students array
     # id is created with the intent that deletion doesn't delete a record
-    id_string = ("000" + students.count.to_s).split('').last(3).join
+    id_string = ("000" + students.count.to_s)[-3,3]
     students << {name: name, id: id_string, cohort: :november, status: "active"}
 
     puts "Now we have #{students.count} students"
@@ -37,14 +37,16 @@ def print_students(students)
 
   students.each do |student|
     if student[:status] == "active"
-      puts "#{student[:id]} - " + student[:name].center(max_name_length) + " (#{student[:cohort]} cohort)"
+      puts "#{student[:id]} - " + student[:name].center(max_name_length) +
+          " (#{student[:cohort]} cohort)"
     end
   end
 end
 
 def print_footer(names)
   # print the footer for the list of students
-  puts "\nOverall, we have #{names.select { |student| student[:status] == "active" }.count} great students\n"
+  puts "\nOverall, we have #{names.select
+      { |student| student[:status] == "active" }.count} great students\n"
 end
 
 def report_first_letter(students, report_key)
