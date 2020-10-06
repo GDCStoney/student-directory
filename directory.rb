@@ -1,3 +1,5 @@
+require 'io/console'
+
 def input_students
   puts "Please enter the names of the students"
   puts "to finish, just hit return twice"
@@ -63,6 +65,48 @@ def report_short_names(students, report_length)
   end
 end
 
+def get_user_input (location)
+  choices = {
+    :main => ["report", "create", "print", "exit"],
+    :reports => ["first letter", "short names", "quit"]
+  }
+  input_full = ''
+
+  case location
+  when "main"
+    puts "What would you like to do?   '?' for help"
+  when "reports"
+    puts "Which report would you like to run?   '?' for help"
+  end
+
+  input_char = STDIN.getch
+
+  case input_char
+  when "?"
+    puts "\n'" + choices[location.to_sym].join("', '") + "'"
+    input_full = ''
+    input_char = ''
+  else
+    while input_char != "\r"
+      input_full += input_char
+      print input_char
+
+      choices[location.to_sym].each  do |choice|
+        if input_full == choice[0..input_full.length-1]
+          print choice[input_full.length..choice.length]
+          input_full = choice
+        end
+      end
+
+      input_char = STDIN.getch
+    end
+
+    print "\n"
+  end
+
+  input_full
+end
+
 def kernel
   # Setup variables
   students = [
@@ -81,12 +125,9 @@ def kernel
   user_input = ""
 
   while user_input != "exit" do
-    puts "\nWhat would you like to do? '?' for help"
-    user_input = gets.chomp.downcase
+    user_input = get_user_input("main")
 
     case user_input
-    when "?"
-      puts "'create' 'print' 'report' 'exit'"
     when "create"
       student_input = input_students
       if !student_input.empty?
@@ -100,12 +141,9 @@ def kernel
 
     when "report"
       while user_input !="quit"
-        puts "\nWhich report? '?' for help"
-        user_input = gets.chomp.downcase
+        user_input = get_user_input("reports")
 
         case user_input
-        when "?"
-          puts "'first letter', 'short name', 'quit'"
         when "first letter"
           puts "\nLetter to report by:"
           report_key = gets.chomp.downcase
