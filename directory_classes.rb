@@ -49,7 +49,17 @@ class CmdCreator
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         input_command += input_char
         print input_char
+
+        @commands_valid[location].each do |command|
+          if command[0..input_command.length-1] == input_command
+            print "\033[100D\033[K#{command}"
+            input_command = command
+            break
+          end
+        end
+
       end
+
 
       input_char = STDIN.getch
     end
@@ -66,7 +76,7 @@ end
 def kernel
   puts "Welcome - what would you like to do?"
   input_command = CmdCreator.new(:main).input_command
-
+  puts "\n#{input_command}"
 end
 
 kernel
