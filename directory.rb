@@ -45,8 +45,9 @@ end
 
 def print_footer(names)
   # print the footer for the list of students
-  puts "\nOverall, we have #{names.select
-      { |student| student[:status] == "active" }.count} great students\n"
+  puts "\nOverall, we have
+    #{names.select { |student| student[:status] == "active" }.count}
+    great students\n"
 end
 
 def report_first_letter(students, report_key)
@@ -67,10 +68,22 @@ def report_short_names(students, report_length)
   end
 end
 
+def report_cohort_listing(students)
+  puts "\n"
+  student_list = students.group_by { |student| student[:cohort] }
+  student_list.each do |key, value|
+    puts "COHORT - #{key.capitalize.to_s}"
+    value.sort { |a, b| a[:name] <=> b[:name] }.each do |student|
+      puts "   #{student[:name]}"
+    end
+    print "\n"
+  end
+end
+
 def get_user_input (location)
   choices = {
     :main => ["report", "create", "print", "exit"],
-    :reports => ["first letter", "short names", "quit"]
+    :reports => ["first letter", "short names", "cohort listing", "quit"]
   }
   input_full = ''
 
@@ -126,12 +139,12 @@ def kernel
     {name: "Darth Vader", id: "002", cohort: :november, status: "active"},
     {name: "Nurse Ratched", id: "003", cohort: :november, status: "active"},
     {name: "Michael Corleone", id: "004", cohort: :november, status: "active"},
-    {name: "Alex DeLarge", id: "005", cohort: :november, status: "active"},
-    {name: "The Wicked Witch of the West", id: "006", cohort: :november, status: "active"},
+    {name: "Alex DeLarge", id: "005", cohort: :july, status: "active"},
+    {name: "The Wicked Witch of the West", id: "006", cohort: :july, status: "active"},
     {name: "Terminator", id: "007", cohort: :november, status: "active"},
     {name: "Freddy Krueger", id: "008", cohort: :november, status: "active"},
     {name: "The Joker", id: "009", cohort: :november, status: "active"},
-    {name: "Joffrey Baratheon", id: "010", cohort: :november, status: "active"},
+    {name: "Joffrey Baratheon", id: "010", cohort: :july, status: "active"},
     {name: "Norman Bates", id: "011", cohort: :november, status: "active"}
   ]
   user_input = ""
@@ -161,11 +174,15 @@ def kernel
           report_key = gets.chomp.downcase
 
           report_first_letter(students,report_key)
+
         when "short names"
           puts "\nMax length of name:"
           report_length = gets.chomp.to_i
 
           report_short_names(students, report_length)
+
+        when "cohort listing"
+          report_cohort_listing(students)
         end
       end
     end
