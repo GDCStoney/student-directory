@@ -73,8 +73,15 @@ def report_cohort_listing(students)
   student_list = students.group_by { |student| student[:cohort] }
   student_list.each do |key, value|
     puts "COHORT - #{key.capitalize.to_s}"
+    max_name_length = 0
+    value.each do |student|
+      if student[:name].length > max_name_length
+        max_name_length = student[:name].length
+      end 
+    end
+
     value.sort { |a, b| a[:name] <=> b[:name] }.each do |student|
-      puts "   #{student[:name]}"
+      puts "   " + student[:name].ljust(max_name_length, " ") + " - #{student[:id]}"
     end
     print "\n"
   end
