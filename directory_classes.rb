@@ -68,6 +68,7 @@ class CmdCreator
     while input_char != "\r"
       if input_char == "\u007F"
         command_output = command_output[0..-2]
+        tab_commands=[]
         print "\033[1D\033[K"
       elsif input_char =="\t"
         if tab_commands.length > 1
@@ -84,7 +85,7 @@ class CmdCreator
           end
         end
       elsif input_char == "?"
-        puts "\033[1A\e[0m\e[4m\t#{@commands_valid.join(",\e[24m \e[4m")}\e[0m\e[3#{command_colour}m"
+        puts "\033[100D\033[1A\e[0m\e[4m\t#{@commands_valid.join(",\e[24m \e[4m")}\e[0m\e[3#{command_colour}m"
         print command_output
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         command_output += input_char
@@ -120,9 +121,6 @@ class Interactive_menu
     @location = :main
   end
 
-  def print # for 'help' function
-  end
-
   def commands_valid
     @@commands_all[@location]
   end
@@ -135,11 +133,11 @@ def kernel
   main_menu = Interactive_menu.new
   command_checker = CmdCreator.new
 
-  puts "#{main_menu.location.upcase}: - what would you like to do?"
+  puts "\n#{main_menu.location.upcase}: - what would you like to do?"
   input_command = command_checker.command_get(main_menu)
 
   main_menu.location = :reports
-  puts "#{main_menu.location.upcase}:- what would you like to do?"
+  puts "\n#{main_menu.location.upcase}:- what would you like to do?"
   input_command = command_checker.command_get(main_menu, 3, false)
 
   puts "\n#{CmdCreator.command_history.inspect}\n\n"
