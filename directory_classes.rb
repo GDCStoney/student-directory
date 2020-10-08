@@ -50,9 +50,6 @@ class CmdCreator
   def command_get(menu_to_use, command_colour = 2, print_initial = true)
     @commands_valid = menu_to_use.commands_valid
     @location = menu_to_use.location
-    @command_colours = {black: 0, red: 1, green: 2, yellow: 3, blue: 4,
-      magenta: 5, cyan: 6, white: 7
-    }
 
     command_output = ""
     tab_commands = []
@@ -85,8 +82,7 @@ class CmdCreator
           end
         end
       elsif input_char == "?"
-        puts "\033[100D\033[1A\e[0m\e[4m\t#{@commands_valid.join(",\e[24m \e[4m")}\e[0m\e[3#{command_colour}m"
-        print command_output
+        menu_to_use.print_help(command_output)
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         command_output += input_char
         print input_char
@@ -109,16 +105,23 @@ end
 
 class Interactive_menu
   attr_reader :commands_all, :commands_valid
-  attr_accessor :location
+  attr_accessor :location, :command_colour
 
   @@commands_all = {
     :main => ["manage students", "manage users", "reports", "exit directory"],
     :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
     :students => ["create list", "add student", "delete student", "quit student management"]
   }
+  def initialize(input_colour)
+    @command_colour = {black: 0, red: 1, green: 2, yellow: 3, blue: 4,
+      magenta: 5, cyan: 6, white: 7}[input_colour.to_sym]
 
-  def initialize
     @location = :main
+  end
+
+  def print_help (current_prompt)
+    puts "\033[100D\033[1A\e[0m\e[4m\t#{@@commands_all[@location].join(",\e[24m \e[4m")}\e[0m\e[3#{@command_colour}m"
+    print current_prompt
   end
 
   def commands_valid
@@ -130,7 +133,7 @@ end
 def kernel
   # best practice to form App variables in the kernel or @@ class variables
   # at the 'root'???
-  main_menu = Interactive_menu.new
+  main_menu = Interactive_menu.new("green")
   command_checker = CmdCreator.new
 
   puts "\n#{main_menu.location.upcase}: - what would you like to do?"
