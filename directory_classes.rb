@@ -51,9 +51,12 @@ class CmdCreator
     @commands_valid = menu_to_use.commands_valid
     @location = menu_to_use.location
 
-    input_char = STDIN.getch
     command_output = ""
     tab_commands = []
+
+    puts "\n" # this is to provide room for the 'help' function if needed
+
+    input_char = "?" #STDIN.getch
 
     while input_char != "\r"
       if input_char == "\u007F"
@@ -73,6 +76,9 @@ class CmdCreator
             command_output = tab_commands[0]
           end
         end
+      elsif input_char == "?"
+        puts "\033[1A\t#{@commands_valid.join(", ")}"
+        print command_output
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         command_output += input_char
         print input_char
@@ -82,7 +88,7 @@ class CmdCreator
     end
     print "\n"
 
-    @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M"),
+    @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
         :location => menu_to_use.location, :command => command_output}
 
     if @commands_valid.include? command_output
@@ -129,7 +135,7 @@ def kernel
   puts "#{main_menu.location.upcase}:- what would you like to do?"
   input_command = command_checker.command_get(main_menu)
 
-  puts CmdCreator.command_history.inspect
+  puts "\n#{CmdCreator.command_history.inspect}\n\n"
 end
 
 kernel
