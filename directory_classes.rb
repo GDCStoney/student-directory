@@ -53,22 +53,29 @@ class CmdCreator
 
     input_char = STDIN.getch
     command_output = ""
+    tab_commands = []
 
     while input_char != "\r"
       if input_char == "\u007F"
         command_output = command_output[0..-2]
         print "\033[1D\033[K"
+      elsif input_char =="\t"
+        if tab_commands.length > 1
+          tab_commands.rotate!
+          print "\033[100D\033[K#{tab_commands[0]}"
+          command_output = tab_commands[0]
+        else
+          tab_commands =  @commands_valid.select { |command|
+            command[0..command_output.length-1] == command_output
+          }
+          if tab_commands.length >= 1
+            print "\033[100D\033[K#{tab_commands[0]}"
+            command_output = tab_commands[0]
+          end
+        end
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         command_output += input_char
         print input_char
-
-        @commands_valid.each do |command|
-          if command[0..command_output.length-1] == command_output
-            print "\033[100D\033[K#{command}"
-            command_output = command
-            break
-          end
-        end
       end
 
       input_char = STDIN.getch
@@ -91,7 +98,7 @@ class Interactive_menu
   attr_accessor :location
 
   @@commands_all = {
-    :main => ["manage students", "reports", "exit directory"],
+    :main => ["manage students", "manage users", "reports", "exit directory"],
     :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
     :students => ["create list", "add student", "delete student", "quit student management"]
   }
@@ -100,10 +107,7 @@ class Interactive_menu
     @location = :main
   end
 
-  def print
-  end
-
-  def select
+  def print # for 'help' function
   end
 
   def commands_valid
@@ -118,13 +122,11 @@ def kernel
   main_menu = Interactive_menu.new
   command_checker = CmdCreator.new
 
-  puts "Welcome - what would you like to do?"
+  puts "#{main_menu.location.upcase}: - what would you like to do?"
   input_command = command_checker.command_get(main_menu)
 
-  puts CmdCreator.command_history
-
   main_menu.location = :reports
-  puts "Welcome - what would you like to do?"
+  puts "#{main_menu.location.upcase}:- what would you like to do?"
   input_command = command_checker.command_get(main_menu)
 
   puts CmdCreator.command_history.inspect
