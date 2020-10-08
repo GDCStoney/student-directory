@@ -44,10 +44,9 @@ class CmdCreator
   end
 
   def initialize
-
   end
 
-  def command_get(menu_to_use, command_colour = 2, print_initial = true)
+  def command_get(menu_to_use, print_initial = false, command_colour = 2)
     @commands_valid = menu_to_use.commands_valid
     @location = menu_to_use.location
 
@@ -90,7 +89,7 @@ class CmdCreator
 
       input_char = STDIN.getch
     end
-    print "\e[0m\n"
+    print "\n"
 
     @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
         :location => menu_to_use.location, :command => command_output}
@@ -103,7 +102,7 @@ class CmdCreator
   end
 end
 
-class Interactive_menu
+class Interactive_menu < CmdCreator
   attr_reader :commands_all, :commands_valid
   attr_accessor :location, :command_colour
 
@@ -117,6 +116,12 @@ class Interactive_menu
       magenta: 5, cyan: 6, white: 7}[input_colour.to_sym]
 
     @location = :main
+  end
+
+  def selection_get
+    puts "\n#{@location.upcase}: - what would you like to do?"
+    command_get(self)
+    print "\e[0m"
   end
 
   def print_help (current_prompt)
@@ -134,14 +139,11 @@ def kernel
   # best practice to form App variables in the kernel or @@ class variables
   # at the 'root'???
   main_menu = Interactive_menu.new("green")
-  command_checker = CmdCreator.new
 
-  puts "\n#{main_menu.location.upcase}: - what would you like to do?"
-  input_command = command_checker.command_get(main_menu)
+  input_command = main_menu.selection_get
 
   main_menu.location = :reports
-  puts "\n#{main_menu.location.upcase}:- what would you like to do?"
-  input_command = command_checker.command_get(main_menu, 3, false)
+  input_command = main_menu.selection_get
 
   puts "\n#{CmdCreator.command_history.inspect}\n\n"
 end
