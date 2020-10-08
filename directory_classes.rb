@@ -21,6 +21,11 @@ end
 
 class School
   attr_accessor :name, :location, :id
+
+  def initialize(name, location)
+    @name = name
+    @location = location
+  end
 end
 
 class User # place holder at the moment ... MIGHT want to implement later
@@ -30,53 +35,67 @@ class CmdCreator
   # take the character inputs ... and work towards building a "command"
   # for the responding methods
   require 'io/console'
-  attr_reader :input_command
+  attr_reader :output_command
 
-  def initialize(location)
-    @commands_valid ={
-      :main => ["manage students", "reports", "exit directory"],
-      :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
-      :students => ["create list", "add student", "delete student", "quit student management"]
-    }
+  @@command_history = []
+
+  def initialize(commands, location)
+    @commands_valid = commands
 
     input_char = STDIN.getch
-    input_command = ""
+    output_command = ""
 
     while input_char != "\r"
       if input_char == "\u007F"
-        input_command = input_command[0..-2]
+        output_command = output_command[0..-2]
         print "\033[1D\033[K"
       elsif !((/[a-z\s]/ =~ input_char) == nil)
-        input_command += input_char
+        output_command += input_char
         print input_char
 
         @commands_valid[location].each do |command|
-          if command[0..input_command.length-1] == input_command
+          if command[0..output_command.length-1] == output_command
             print "\033[100D\033[K#{command}"
-            input_command = command
+            output_command = command
             break
           end
         end
-
       end
-
 
       input_char = STDIN.getch
     end
+    print "\n"
 
-    if @commands_valid[location].include? input_command
-      @input_command = input_command
+    @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M"), :location => location, :command => output_command}
+
+    if @commands_valid[location].include? output_command
+      @output_command = output_command
     else
-      @input_command = false
+      @output_command = false
     end
+  end
+
+  def self.command_history
+    @@command_history
   end
 end
 
 # how to manage the visual interface - another class / or methods?
 def kernel
+  # best practice to form App variables in the kernel or @@ class variables
+  # at the 'root'???
+  menu_commands = {
+    :main => ["manage students", "reports", "exit directory"],
+    :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
+    :students => ["create list", "add student", "delete student", "quit student management"]
+  }
+
   puts "Welcome - what would you like to do?"
-  input_command = CmdCreator.new(:main).input_command
-  puts "\n#{input_command}"
+  input_command = CmdCreator.new(menu_commands, :main).output_command
+
+  input_command = CmdCreator.new(menu_commands, :reports).output_command
+
+  puts CmdCreator.command_history.inspect
 end
 
 kernel
