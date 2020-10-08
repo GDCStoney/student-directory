@@ -47,7 +47,7 @@ class CmdCreator
 
   end
 
-  def command_get(menu_to_use)
+  def command_get(menu_to_use,print_initial = true)
     @commands_valid = menu_to_use.commands_valid
     @location = menu_to_use.location
 
@@ -56,7 +56,11 @@ class CmdCreator
 
     puts "\n" # this is to provide room for the 'help' function if needed
 
-    input_char = "?" #STDIN.getch
+    if print_initial # see if initial menu needs to be printed before input
+      input_char = "?"
+    else
+      input_char = STDIN.getch
+    end
 
     while input_char != "\r"
       if input_char == "\u007F"
@@ -133,7 +137,7 @@ def kernel
 
   main_menu.location = :reports
   puts "#{main_menu.location.upcase}:- what would you like to do?"
-  input_command = command_checker.command_get(main_menu)
+  input_command = command_checker.command_get(main_menu, false)
 
   puts "\n#{CmdCreator.command_history.inspect}\n\n"
 end
