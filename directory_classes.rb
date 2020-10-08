@@ -47,14 +47,17 @@ class CmdCreator
 
   end
 
-  def command_get(menu_to_use,print_initial = true)
+  def command_get(menu_to_use, command_colour = 2, print_initial = true)
     @commands_valid = menu_to_use.commands_valid
     @location = menu_to_use.location
+    @command_colours = {black: 0, red: 1, green: 2, yellow: 3, blue: 4,
+      magenta: 5, cyan: 6, white: 7
+    }
 
     command_output = ""
     tab_commands = []
 
-    puts "\n" # this is to provide room for the 'help' function if needed
+    puts "\e[3#{command_colour}m" # this is to provide room for the 'help' function
 
     if print_initial # see if initial menu needs to be printed before input
       input_char = "?"
@@ -81,7 +84,7 @@ class CmdCreator
           end
         end
       elsif input_char == "?"
-        puts "\033[1A\t#{@commands_valid.join(", ")}"
+        puts "\033[1A\e[0m\e[4m\t#{@commands_valid.join(",\e[24m \e[4m")}\e[0m\e[3#{command_colour}m"
         print command_output
       elsif !((/[a-z\s]/ =~ input_char) == nil)
         command_output += input_char
@@ -90,7 +93,7 @@ class CmdCreator
 
       input_char = STDIN.getch
     end
-    print "\n"
+    print "\e[0m\n"
 
     @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
         :location => menu_to_use.location, :command => command_output}
@@ -137,7 +140,7 @@ def kernel
 
   main_menu.location = :reports
   puts "#{main_menu.location.upcase}:- what would you like to do?"
-  input_command = command_checker.command_get(main_menu, false)
+  input_command = command_checker.command_get(main_menu, 3, false)
 
   puts "\n#{CmdCreator.command_history.inspect}\n\n"
 end
