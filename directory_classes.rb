@@ -37,26 +37,35 @@ class CmdCreator
   require 'io/console'
   attr_reader :output_command
 
-  @@command_history = []
+  @@command_history=[]
 
-  def initialize(commands, location)
-    @commands_valid = commands
+  def self.command_history
+    @@command_history
+  end
+
+  def initialize
+
+  end
+
+  def command_get(menu_to_use)
+    @commands_valid = menu_to_use.commands_valid
+    @location = menu_to_use.location
 
     input_char = STDIN.getch
-    output_command = ""
+    command_output = ""
 
     while input_char != "\r"
       if input_char == "\u007F"
-        output_command = output_command[0..-2]
+        command_output = command_output[0..-2]
         print "\033[1D\033[K"
       elsif !((/[a-z\s]/ =~ input_char) == nil)
-        output_command += input_char
+        command_output += input_char
         print input_char
 
-        @commands_valid[location].each do |command|
-          if command[0..output_command.length-1] == output_command
+        @commands_valid.each do |command|
+          if command[0..command_output.length-1] == command_output
             print "\033[100D\033[K#{command}"
-            output_command = command
+            command_output = command
             break
           end
         end
@@ -66,17 +75,39 @@ class CmdCreator
     end
     print "\n"
 
-    @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M"), :location => location, :command => output_command}
+    @@command_history << {:date => Time.now.strftime("%Y-%m-%d %H:%M"),
+        :location => menu_to_use.location, :command => command_output}
 
-    if @commands_valid[location].include? output_command
-      @output_command = output_command
+    if @commands_valid.include? command_output
+      @output_command = command_output
     else
       @output_command = false
     end
   end
+end
 
-  def self.command_history
-    @@command_history
+class Interactive_menu
+  attr_reader :commands_all, :commands_valid
+  attr_accessor :location
+
+  @@commands_all = {
+    :main => ["manage students", "reports", "exit directory"],
+    :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
+    :students => ["create list", "add student", "delete student", "quit student management"]
+  }
+
+  def initialize
+    @location = :main
+  end
+
+  def print
+  end
+
+  def select
+  end
+
+  def commands_valid
+    @@commands_all[@location]
   end
 end
 
@@ -84,16 +115,17 @@ end
 def kernel
   # best practice to form App variables in the kernel or @@ class variables
   # at the 'root'???
-  menu_commands = {
-    :main => ["manage students", "reports", "exit directory"],
-    :reports => ["student listing", "first letter", "cohort listing", "quit reports"],
-    :students => ["create list", "add student", "delete student", "quit student management"]
-  }
+  main_menu = Interactive_menu.new
+  command_checker = CmdCreator.new
 
   puts "Welcome - what would you like to do?"
-  input_command = CmdCreator.new(menu_commands, :main).output_command
+  input_command = command_checker.command_get(main_menu)
 
-  input_command = CmdCreator.new(menu_commands, :reports).output_command
+  puts CmdCreator.command_history
+
+  main_menu.location = :reports
+  puts "Welcome - what would you like to do?"
+  input_command = command_checker.command_get(main_menu)
 
   puts CmdCreator.command_history.inspect
 end
