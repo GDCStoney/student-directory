@@ -19,7 +19,7 @@ end
 
 def print
   @students.each_with_index do |student, index|
-    puts "#{index}. #{student[:name]} (#{student[:cohort].capitalize} cohort)"
+    puts "#{index + 1}. #{student[:name]} (#{student[:cohort].capitalize} cohort)"
   end
 end
 
@@ -33,7 +33,7 @@ def input_students
 
   students = []
 
-  student = gets.chomp
+  student = STDIN.gets.chomp
   while !student.empty? do
     if student.split(":")[0].empty?
       student_name = "TBC"
@@ -54,7 +54,7 @@ def input_students
       puts "Now we have #{students.count} students"
     end
 
-    student = gets.chomp
+    student = STDIN.gets.chomp
   end
 
   if students == []
@@ -74,30 +74,64 @@ def save_students
   file.close
 end
 
-def interactive_menu
-  loop do
-    puts "\n1. Input the students"
-    puts "2. Show the students"
-    puts "3. Save the list to students.csv"
-    puts "9. Exit"
+def load_students(filename = "students.csv")
+  @students = []
+  file = File.open(filename, "r")
+  file.readlines.each do |line|
+    name, cohort = line.chomp.split(',')
+    @students << {name: name, cohort: cohort.to_sym}
+  end
+  file.close
+end
 
-    selection = gets.chomp
-
-    case selection
-    when "1"
-      @students = intput_students
-    when "2"
-      print_header
-      print
-      print_footer
-    when "3"
-      save_students
-    when "9"
-      exit
-    else
-      puts "I don't know what you meant, try again"
-    end
+def load_students_at_launch
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exists?(filename)
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else
+    puts "Sorry, #{filename} doesn't exist"
   end
 end
 
+def print_menu
+  puts "\n1. Input the students"
+  puts "2. Show the students"
+  puts "3. Save the list to students.csv"
+  puts "4. Load students from students.csv"
+  puts "9. Exit"
+end
+
+def interactive_menu
+  loop do
+    print_menu
+    process(STDIN.gets.chomp)
+  end
+end
+
+def show_students
+  print_header
+  print
+  print_footer
+end
+
+def process(selection)
+  case selection
+  when "1"
+    @students = intput_students
+  when "2"
+    show_students
+  when "3"
+    save_students
+  when "4"
+    load_students
+  when "9"
+    exit
+  else
+    puts "I don't know what you meant, try again"
+  end
+end
+
+load_students_at_launch
 interactive_menu
