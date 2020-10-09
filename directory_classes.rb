@@ -52,6 +52,7 @@ class CmdCreator
 
     command_output = ""
     tab_commands = []
+    tab_previous = false
 
     puts "\e[3#{command_colour}m" # this is to provide room for the 'help' function
 
@@ -63,28 +64,38 @@ class CmdCreator
 
     while input_char != "\r"
       if input_char == "\u007F"
-        command_output = command_output[0..-2]
-        tab_commands=[]
-        print "\033[1D\033[K"
-      elsif input_char =="\t"
-        if tab_commands.length > 1
-          tab_commands.rotate!
-          print "\033[100D\033[K#{tab_commands[0]}"
-          command_output = tab_commands[0]
+        if tab_previous
+          tab_previous = false
+          command_output = ""
+          print "\033[100D\033[K"
         else
-          tab_commands =  @commands_valid.select { |command|
-            command[0..command_output.length-1] == command_output
-          }
-          if tab_commands.length >= 1
+          tab_previous = true
+          command_output = command_output[0..-2]
+          tab_commands=[]
+          print "\033[1D\033[K"
+        end
+      else
+        tab_previous = false
+        if input_char =="\t"
+          if tab_commands.length > 1
+            tab_commands.rotate!
             print "\033[100D\033[K#{tab_commands[0]}"
             command_output = tab_commands[0]
+          else
+            tab_commands =  @commands_valid.select { |command|
+              command[0..command_output.length-1] == command_output
+            }
+            if tab_commands.length >= 1
+              print "\033[100D\033[K#{tab_commands[0]}"
+              command_output = tab_commands[0]
+            end
           end
+        elsif input_char == "?"
+          menu_to_use.print_help(command_output)
+        elsif !((/[a-z\s]/ =~ input_char) == nil)
+          command_output += input_char
+          print input_char
         end
-      elsif input_char == "?"
-        menu_to_use.print_help(command_output)
-      elsif !((/[a-z\s]/ =~ input_char) == nil)
-        command_output += input_char
-        print input_char
       end
 
       input_char = STDIN.getch
